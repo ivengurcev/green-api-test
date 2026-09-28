@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MAX Chat — Чат</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main class="chat-shell">
+    <aside class="sidebar">
+      <div class="brand sidebar-brand">
+        <div class="logo" aria-hidden="true"></div>
+        <span>MAX Chat</span>
+      </div>
+
+      <button class="new-chat" type="button">
+        <span aria-hidden="true">＋</span>
+        Новый чат
+      </button>
+
+      <div class="chat-list">
+        <button class="chat-list-item active" type="button">
+          <span class="chat-list-copy">
+            <strong>+7 999 123-45-67</strong>
+            <span>Как дела?</span>
+          </span>
+          <time>12:24</time>
+        </button>
+      </div>
+    </aside>
+
+    <section class="conversation">
+      <header class="conversation-header">
+        <strong>+7 999 123-45-67</strong>
+        <span class="online">В сети</span>
+      </header>
+
+      <div class="messages">
+        <div class="message-row incoming">
+          <div class="message">
+            Привет!
+            <time>12:20</time>
+          </div>
+        </div>
+
+        <div class="message-row outgoing">
+          <div class="message">
+            Привет!
+            <time>12:21 ✓✓</time>
+          </div>
+        </div>
+
+        <div class="message-row incoming">
+          <div class="message">
+            Это тестовое сообщение из MAX
+            <time>12:21</time>
+          </div>
+        </div>
+
+        <div class="message-row outgoing">
+          <div class="message">
+            Отлично, всё работает
+            <time>12:22 ✓✓</time>
+          </div>
+        </div>
+
+        <div class="message-row incoming">
+          <div class="message">
+            Как дела?
+            <time>12:24</time>
+          </div>
+        </div>
+
+        <div class="message-row outgoing">
+          <div class="message">
+            Всё хорошо, спасибо!<br>
+            А у тебя?
+            <time>12:24 ✓✓</time>
+          </div>
+        </div>
+      </div>
+
+      <form class="message-form">
+        <input type="text" placeholder="Напишите сообщение...">
+        <button class="send-button" type="button" aria-label="Отправить">
+          <span>➤</span>
+        </button>
+      </form>
+    </section>
+  </main>
+</body>
+</html>

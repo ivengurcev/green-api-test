@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MAX Chat — Авторизация</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main class="auth-page">
+    <div class="brand auth-brand">
+      <div class="logo" aria-hidden="true"></div>
+      <span>MAX Chat</span>
+    </div>
+
+    <section class="auth-card">
+      <div class="logo large" aria-hidden="true"></div>
+
+      <h1>Вход в чат</h1>
+
+      <p class="auth-description">
+        Введите данные из личного кабинета<br>
+        GREEN-API для работы с MAX
+      </p>
+
+      <form class="auth-form">
+        <div class="field">
+          <label for="id-instance">idInstance</label>
+          <input
+            id="id-instance"
+            name="idInstance"
+            type="text"
+            placeholder="Введите idInstance"
+            autocomplete="off"
+          >
+        </div>
+
+        <div class="field">
+          <label for="api-token">apiTokenInstance</label>
+          <input
+            id="api-token"
+            name="apiTokenInstance"
+            type="password"
+            placeholder="Введите apiTokenInstance"
+            autocomplete="off"
+          >
+        </div>
+
+        <button class="primary-button" type="button">Войти</button>
+      </form>
+
+      <p class="auth-note">
+        <span class="auth-note-icon" aria-hidden="true">🔒</span>
+        <span>
+          Данные хранятся только в памяти браузера
+          и будут сброшены при перезагрузке страницы.
+        </span>
+      </p>
+    </section>
+  </main>
+</body>
+</html>
