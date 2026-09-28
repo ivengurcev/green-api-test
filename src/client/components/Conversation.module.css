@@ -5,6 +5,24 @@
     grid-template-rows: auto 1fr auto;
 }
 
+.empty {
+    display: grid;
+    padding: 24px;
+    color: var(--color-text-secondary);
+    text-align: center;
+    place-items: center;
+}
+
+.empty h1 {
+    margin: 0 0 8px;
+    color: var(--color-text);
+    font-size: 22px;
+}
+
+.empty p {
+    margin: 0;
+}
+
 .header {
     display: flex;
     flex-direction: column;
@@ -15,22 +33,6 @@
 
 .header strong {
     font-size: 17px;
-}
-
-.online {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    color: var(--color-text-secondary);
-    font-size: 12px;
-}
-
-.online::after {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--color-success);
-    content: "";
 }
 
 .messages {

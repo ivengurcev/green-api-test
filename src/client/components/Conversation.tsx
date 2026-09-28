@@ -1,23 +1,34 @@
+import type {ActiveChat, ChatMessage} from '../chat/types.js';
 import styles from './Conversation.module.css';
 
-export type Message = {
-    id: number;
-    text: string;
-    time: string;
-    direction: 'incoming' | 'outgoing';
-};
-
 type ConversationProps = {
-    phone: string;
-    messages: Message[];
+    activeChat: ActiveChat | null;
+    messages: ChatMessage[];
 };
 
-export default function Conversation({phone, messages}: ConversationProps) {
+function formatTime(timestamp: number): string {
+    return new Intl.DateTimeFormat('ru-RU', {
+        hour: '2-digit',
+        minute: '2-digit',
+    }).format(timestamp);
+}
+
+export default function Conversation({activeChat, messages}: ConversationProps) {
+    if (!activeChat) {
+        return (
+            <section className={`${styles.conversation} ${styles.empty}`}>
+                <div>
+                    <h1>Создайте новый чат</h1>
+                    <p>Укажите номер, зарегистрированный в WhatsApp.</p>
+                </div>
+            </section>
+        );
+    }
+
     return (
         <section className={styles.conversation}>
             <header className={styles.header}>
-                <strong>{phone}</strong>
-                <span className={styles.online}>В сети</span>
+                <strong>{activeChat.phone}</strong>
             </header>
 
             <div className={styles.messages}>
@@ -33,7 +44,9 @@ export default function Conversation({phone, messages}: ConversationProps) {
                                     {line}
                                 </span>
                             ))}
-                            <time>{message.time}</time>
+                            <time dateTime={new Date(message.timestamp).toISOString()}>
+                                {formatTime(message.timestamp)}
+                            </time>
                         </div>
                     </div>
                 ))}
