@@ -5,7 +5,9 @@ import styles from './Conversation.module.css';
 
 type ConversationProps = {
     activeChat: ActiveChat | null;
+    mobileVisible: boolean;
     session: ChatSession;
+    onBack(): void;
 };
 
 function formatTime(timestamp: number): string {
@@ -15,10 +17,17 @@ function formatTime(timestamp: number): string {
     }).format(timestamp);
 }
 
-export default function Conversation({activeChat, session}: ConversationProps) {
+export default function Conversation({
+    activeChat,
+    mobileVisible,
+    session,
+    onBack,
+}: ConversationProps) {
+    const className = `${styles.conversation} ${mobileVisible ? styles.mobileVisible : ''}`;
+
     if (!activeChat) {
         return (
-            <section className={`${styles.conversation} ${styles.empty}`}>
+            <section className={`${className} ${styles.empty}`}>
                 <div>
                     <h1>Создайте новый чат</h1>
                     <p>Укажите номер, зарегистрированный в WhatsApp.</p>
@@ -33,8 +42,16 @@ export default function Conversation({activeChat, session}: ConversationProps) {
     }
 
     return (
-        <section className={styles.conversation}>
+        <section className={className}>
             <header className={styles.header}>
+                <button
+                    className={styles.backButton}
+                    type="button"
+                    aria-label="Назад к чатам"
+                    onClick={onBack}
+                >
+                    <span aria-hidden="true">←</span>
+                </button>
                 <strong>{activeChat.phone}</strong>
             </header>
 

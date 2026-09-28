@@ -22,6 +22,8 @@
     --color-message-time: #8a97aa;
     --color-success: #22c55e;
     --color-danger: #ef4444;
+    --color-danger-text: #c33;
+    --color-focus-ring: #80b8ff;
 
     --radius-small: 8px;
     --radius-medium: 12px;

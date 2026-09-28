@@ -10,6 +10,7 @@ import styles from './Chat.module.css';
 
 export default function Chat({client}: {client: GreenApiClient}) {
     const [activeChat, setActiveChat] = useState<ActiveChat | null>(null);
+    const [mobileView, setMobileView] = useState<'list' | 'conversation'>('list');
     const [dialogOpen, setDialogOpen] = useState(false);
     const [checkPending, setCheckPending] = useState(false);
     const [checkError, setCheckError] = useState<string | null>(null);
@@ -64,8 +65,8 @@ export default function Chat({client}: {client: GreenApiClient}) {
             }
 
             setActiveChat({chatId: checked.chatId, phone: `+${phone}`});
+            setMobileView('conversation');
             setDialogOpen(false);
-            queueMicrotask(() => newChatButtonRef.current?.focus());
         } catch (error) {
             if (requestId === latestCheckRef.current && !controller.signal.aborted) {
                 setCheckError('Не удалось проверить номер. Попробуйте снова.');
@@ -82,10 +83,17 @@ export default function Chat({client}: {client: GreenApiClient}) {
         <main className={styles.shell}>
             <ChatSidebar
                 activeChat={activeChat}
+                mobileVisible={mobileView === 'list'}
                 newChatButtonRef={newChatButtonRef}
                 onNewChat={openDialog}
+                onSelectActive={() => setMobileView('conversation')}
             />
-            <Conversation activeChat={activeChat} session={session} />
+            <Conversation
+                activeChat={activeChat}
+                mobileVisible={mobileView === 'conversation'}
+                session={session}
+                onBack={() => setMobileView('list')}
+            />
             <NewChatDialog
                 open={dialogOpen}
                 pending={checkPending}

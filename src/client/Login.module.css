@@ -125,7 +125,7 @@
 
 .error {
     margin: -4px 0 0;
-    color: #c33;
+    color: var(--color-danger-text);
     font-size: 13px;
     line-height: 1.4;
 }
@@ -153,7 +153,7 @@
     place-items: center;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 767px) {
     .pageBrand {
         top: 20px;
         left: 20px;

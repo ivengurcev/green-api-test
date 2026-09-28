@@ -43,6 +43,12 @@
     background: var(--color-surface-secondary);
 }
 
+.close:focus-visible,
+.submit:focus-visible {
+    outline: 3px solid var(--color-focus-ring);
+    outline-offset: 2px;
+}
+
 .form {
     display: flex;
     flex-direction: column;
@@ -70,7 +76,7 @@
 
 .error {
     margin: 2px 0;
-    color: #c33;
+    color: var(--color-danger-text);
     font-size: 13px;
 }
 
@@ -87,4 +93,14 @@
 .submit:disabled {
     cursor: wait;
     opacity: 0.7;
+}
+
+@media (max-width: 767px) {
+    .backdrop {
+        padding: 12px;
+    }
+
+    .dialog {
+        padding: 20px;
+    }
 }

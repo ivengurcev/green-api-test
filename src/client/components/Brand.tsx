@@ -13,7 +13,7 @@ export default function Brand({className = '', large = false, showName = true}: 
     return (
         <div className={brandClassName}>
             <div className={logoClassName} aria-hidden="true" />
-            {showName && <span>MAX Chat</span>}
+            {showName && <span>WhatsApp Chat</span>}
         </div>
     );
 }
