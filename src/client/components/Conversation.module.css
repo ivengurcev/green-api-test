@@ -47,6 +47,16 @@
         radial-gradient(circle at 20% 10%, rgb(0 119 255 / 5%), transparent 30%);
 }
 
+.receiveError {
+    align-self: center;
+    margin: 0;
+    padding: 8px 12px;
+    border-radius: var(--radius-medium);
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    background: var(--color-surface-secondary);
+}
+
 .messageRow {
     display: flex;
 }

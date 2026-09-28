@@ -17,6 +17,9 @@ async function submitNewChat(user: ReturnType<typeof userEvent.setup>, phone: st
 describe('Chat', () => {
     beforeEach(() => {
         client.checkWhatsapp.mockReset();
+        client.receiveNotification.mockReset();
+        client.receiveNotification.mockImplementation(() => new Promise(() => {}));
+        client.deleteNotification.mockReset();
     });
 
     it('creates a chat using the chatId returned by GREEN-API', async () => {

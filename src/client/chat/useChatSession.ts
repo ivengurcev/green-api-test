@@ -1,6 +1,7 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 import type {GreenApiClient} from '../api/types.js';
 import type {ActiveChat, ChatMessage} from './types.js';
+import {useNotificationPolling} from './useNotificationPolling.js';
 
 export type ChatSession = {
     messages: ChatMessage[];
@@ -9,6 +10,8 @@ export type ChatSession = {
     send(): Promise<void>;
     sending: boolean;
     sendError: string | null;
+    receiveError: string | null;
+    receiveStopped: boolean;
     appendIncoming(message: ChatMessage): void;
 };
 
@@ -40,6 +43,11 @@ export function useChatSession(
     const appendIncoming = useCallback((message: ChatMessage) => {
         setMessages((current) => [...current, message]);
     }, []);
+    const polling = useNotificationPolling({
+        client,
+        chatId: activeChat?.chatId ?? null,
+        onMessage: appendIncoming,
+    });
 
     async function send() {
         if (sendingRef.current || !activeChat) {
@@ -99,6 +107,8 @@ export function useChatSession(
         send,
         sending,
         sendError,
+        receiveError: polling.receiveError,
+        receiveStopped: polling.stopped,
         appendIncoming,
     };
 }

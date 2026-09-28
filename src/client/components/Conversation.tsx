@@ -39,6 +39,11 @@ export default function Conversation({activeChat, session}: ConversationProps) {
             </header>
 
             <div className={styles.messages}>
+                {session.receiveError && (
+                    <p className={styles.receiveError} role="status">
+                        {session.receiveError}
+                    </p>
+                )}
                 {session.messages.map((message: ChatMessage) => (
                     <div
                         className={`${styles.messageRow} ${styles[message.direction]}`}

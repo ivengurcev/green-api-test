@@ -1,4 +1,4 @@
-import {act, renderHook} from '@testing-library/react';
+import {act, renderHook, waitFor} from '@testing-library/react';
 import {beforeEach, describe, expect, it} from 'vitest';
 import {GreenApiError} from '../api/GreenApiError.js';
 import {createGreenApiClientMock} from '../test/createGreenApiClientMock.js';
@@ -19,6 +19,9 @@ function createDeferred<T>() {
 describe('useChatSession', () => {
     beforeEach(() => {
         client.sendMessage.mockReset();
+        client.receiveNotification.mockReset();
+        client.receiveNotification.mockImplementation(() => new Promise(() => {}));
+        client.deleteNotification.mockReset();
     });
 
     it('adds a message only after SendMessage succeeds', async () => {
@@ -86,5 +89,35 @@ describe('useChatSession', () => {
         });
 
         expect(client.sendMessage).toHaveBeenCalledTimes(1);
+    });
+
+    it('appends an incoming message from polling', async () => {
+        client.receiveNotification
+            .mockReset()
+            .mockResolvedValueOnce({
+                receiptId: 7,
+                body: {
+                    typeWebhook: 'incomingMessageReceived',
+                    idMessage: 'incoming-1',
+                    timestamp: 1_700_000_000,
+                    senderData: {chatId: activeChat.chatId},
+                    messageData: {
+                        typeMessage: 'textMessage',
+                        textMessageData: {textMessage: 'Ответ'},
+                    },
+                },
+            })
+            .mockImplementation(() => new Promise(() => {}));
+        client.deleteNotification.mockResolvedValue();
+
+        const {result} = renderHook(() => useChatSession(client, activeChat));
+
+        await waitFor(() => expect(result.current.messages).toHaveLength(1));
+        expect(result.current.messages[0]).toMatchObject({
+            id: 'incoming-1',
+            text: 'Ответ',
+            direction: 'incoming',
+        });
+        expect(client.deleteNotification).toHaveBeenCalledWith(7, expect.any(AbortSignal));
     });
 });
