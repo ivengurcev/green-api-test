@@ -1,0 +1,36 @@
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.logo {
+    position: relative;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 auto;
+    border-radius: 12px 12px 12px 5px;
+    background: linear-gradient(135deg, var(--color-primary) 10%, var(--color-accent) 85%);
+    box-shadow: 0 8px 20px rgb(0 119 255 / 22%);
+}
+
+.logo::after {
+    position: absolute;
+    inset: 8px;
+    border-radius: 50%;
+    background: var(--color-surface);
+    content: "";
+}
+
+.large {
+    width: 68px;
+    height: 68px;
+    margin: 0 auto 20px;
+    border-radius: 24px 24px 24px 9px;
+}
+
+.large::after {
+    inset: 16px;
+}

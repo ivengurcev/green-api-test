@@ -1,0 +1,38 @@
+:root {
+    --color-primary: #0077ff;
+    --color-primary-hover: #0066e6;
+    --color-primary-light: #2688ff;
+    --color-primary-light-hover: #167eff;
+    --color-accent: #6c5ce7;
+    --color-text: #0f172a;
+    --color-text-strong: #172033;
+    --color-text-secondary: #64748b;
+    --color-text-muted: #94a3b8;
+    --color-surface: #ffffff;
+    --color-surface-secondary: #f8faff;
+    --color-page: #f5f7fb;
+    --color-message-incoming: #f0f3f7;
+    --color-border: #dce2eb;
+    --color-border-soft: #edf0f5;
+    --color-shell-border: #e9edf3;
+    --color-composer-border: #f4f6f9;
+    --color-chat-active: #eaf3ff;
+    --color-auth-note: #7c8799;
+    --color-auth-note-background: #f0f4f9;
+    --color-message-time: #8a97aa;
+    --color-success: #22c55e;
+    --color-danger: #ef4444;
+
+    --radius-small: 8px;
+    --radius-medium: 12px;
+    --radius-large: 16px;
+    --radius-extra-large: 20px;
+    --radius-card: 24px;
+
+    --shadow-card: 0 20px 60px rgb(30 64 175 / 10%), 0 4px 16px rgb(15 23 42 / 5%);
+    --shadow-shell: 0 15px 45px rgb(15 23 42 / 8%);
+    --shadow-primary: 0 8px 20px rgb(0 119 255 / 18%);
+
+    --sidebar-width: 280px;
+    --content-max-width: 1440px;
+}

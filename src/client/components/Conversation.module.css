@@ -1,0 +1,146 @@
+.conversation {
+    display: grid;
+    min-width: 0;
+    min-height: 0;
+    grid-template-rows: auto 1fr auto;
+}
+
+.header {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--color-border-soft);
+}
+
+.header strong {
+    font-size: 17px;
+}
+
+.online {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-text-secondary);
+    font-size: 12px;
+}
+
+.online::after {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--color-success);
+    content: "";
+}
+
+.messages {
+    display: flex;
+    min-height: 0;
+    flex-direction: column;
+    gap: 14px;
+    padding: 28px 24px;
+    overflow-y: auto;
+    background:
+        linear-gradient(rgb(255 255 255 / 96%), rgb(255 255 255 / 96%)),
+        radial-gradient(circle at 20% 10%, rgb(0 119 255 / 5%), transparent 30%);
+}
+
+.messageRow {
+    display: flex;
+}
+
+.incoming {
+    justify-content: flex-start;
+}
+
+.outgoing {
+    justify-content: flex-end;
+}
+
+.message {
+    max-width: min(70%, 520px);
+    padding: 10px 13px 7px;
+    border-radius: var(--radius-large);
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.incoming .message {
+    border-bottom-left-radius: 6px;
+    color: var(--color-text-strong);
+    background: var(--color-message-incoming);
+}
+
+.outgoing .message {
+    border-bottom-right-radius: 6px;
+    color: var(--color-surface);
+    background: var(--color-primary);
+    box-shadow: 0 6px 16px rgb(0 119 255 / 14%);
+}
+
+.message time {
+    display: block;
+    margin-top: 3px;
+    color: var(--color-message-time);
+    text-align: right;
+    font-size: 10px;
+}
+
+.outgoing .message time {
+    color: rgb(255 255 255 / 66%);
+}
+
+.messageForm {
+    display: grid;
+    grid-template-columns: 1fr 48px;
+    gap: 12px;
+    padding: 16px 22px 20px;
+    border-top: 1px solid var(--color-composer-border);
+    background: var(--color-surface);
+}
+
+.messageForm input {
+    width: 100%;
+    height: 48px;
+    padding: 0 18px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+    outline: none;
+    background: var(--color-surface);
+}
+
+.messageForm input::placeholder {
+    color: var(--color-text-muted);
+}
+
+.messageForm input:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgb(0 119 255 / 10%);
+}
+
+.sendButton {
+    display: grid;
+    width: 48px;
+    height: 48px;
+    border: 0;
+    border-radius: 50%;
+    color: var(--color-surface);
+    font-size: 19px;
+    background: var(--color-primary);
+    box-shadow: 0 6px 16px rgb(0 119 255 / 20%);
+    place-items: center;
+}
+
+.sendButton:hover {
+    background: var(--color-primary-hover);
+}
+
+.sendButton span {
+    transform: translateX(-1px) rotate(-8deg);
+}
+
+@media (max-width: 700px) {
+    .message {
+        max-width: 85%;
+    }
+}
