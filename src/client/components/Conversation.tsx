@@ -1,9 +1,11 @@
+import type {SubmitEvent} from 'react';
 import type {ActiveChat, ChatMessage} from '../chat/types.js';
+import type {ChatSession} from '../chat/useChatSession.js';
 import styles from './Conversation.module.css';
 
 type ConversationProps = {
     activeChat: ActiveChat | null;
-    messages: ChatMessage[];
+    session: ChatSession;
 };
 
 function formatTime(timestamp: number): string {
@@ -13,7 +15,7 @@ function formatTime(timestamp: number): string {
     }).format(timestamp);
 }
 
-export default function Conversation({activeChat, messages}: ConversationProps) {
+export default function Conversation({activeChat, session}: ConversationProps) {
     if (!activeChat) {
         return (
             <section className={`${styles.conversation} ${styles.empty}`}>
@@ -25,6 +27,11 @@ export default function Conversation({activeChat, messages}: ConversationProps) 
         );
     }
 
+    function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
+        event.preventDefault();
+        void session.send();
+    }
+
     return (
         <section className={styles.conversation}>
             <header className={styles.header}>
@@ -32,7 +39,7 @@ export default function Conversation({activeChat, messages}: ConversationProps) 
             </header>
 
             <div className={styles.messages}>
-                {messages.map((message) => (
+                {session.messages.map((message: ChatMessage) => (
                     <div
                         className={`${styles.messageRow} ${styles[message.direction]}`}
                         key={message.id}
@@ -52,9 +59,25 @@ export default function Conversation({activeChat, messages}: ConversationProps) 
                 ))}
             </div>
 
-            <form className={styles.messageForm}>
-                <input type="text" placeholder="Напишите сообщение..." aria-label="Сообщение" />
-                <button className={styles.sendButton} type="button" aria-label="Отправить">
+            <form className={styles.messageForm} onSubmit={handleSubmit}>
+                <input
+                    type="text"
+                    placeholder="Напишите сообщение..."
+                    aria-label="Сообщение"
+                    maxLength={20_000}
+                    value={session.draft}
+                    disabled={session.sending}
+                    onChange={(event) => session.setDraft(event.target.value)}
+                />
+                {session.sendError && (
+                    <p className={styles.sendError} role="alert">{session.sendError}</p>
+                )}
+                <button
+                    className={styles.sendButton}
+                    type="submit"
+                    aria-label="Отправить"
+                    disabled={session.sending}
+                >
                     <span aria-hidden="true">➤</span>
                 </button>
             </form>

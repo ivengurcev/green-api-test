@@ -1,7 +1,8 @@
 import {useEffect, useRef, useState} from 'react';
 import type {GreenApiClient} from './api/types.js';
 import {normalizePhone, toPersonalChatId} from './chat/phone.js';
-import type {ActiveChat, ChatMessage} from './chat/types.js';
+import type {ActiveChat} from './chat/types.js';
+import {useChatSession} from './chat/useChatSession.js';
 import ChatSidebar from './components/ChatSidebar.js';
 import Conversation from './components/Conversation.js';
 import NewChatDialog from './components/NewChatDialog.js';
@@ -9,13 +10,13 @@ import styles from './Chat.module.css';
 
 export default function Chat({client}: {client: GreenApiClient}) {
     const [activeChat, setActiveChat] = useState<ActiveChat | null>(null);
-    const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [checkPending, setCheckPending] = useState(false);
     const [checkError, setCheckError] = useState<string | null>(null);
     const latestCheckRef = useRef(0);
     const checkControllerRef = useRef<AbortController | null>(null);
     const newChatButtonRef = useRef<HTMLButtonElement>(null);
+    const session = useChatSession(client, activeChat);
 
     useEffect(() => () => checkControllerRef.current?.abort(), []);
 
@@ -63,7 +64,6 @@ export default function Chat({client}: {client: GreenApiClient}) {
             }
 
             setActiveChat({chatId: checked.chatId, phone: `+${phone}`});
-            setMessages([]);
             setDialogOpen(false);
             queueMicrotask(() => newChatButtonRef.current?.focus());
         } catch (error) {
@@ -85,7 +85,7 @@ export default function Chat({client}: {client: GreenApiClient}) {
                 newChatButtonRef={newChatButtonRef}
                 onNewChat={openDialog}
             />
-            <Conversation activeChat={activeChat} messages={messages} />
+            <Conversation activeChat={activeChat} session={session} />
             <NewChatDialog
                 open={dialogOpen}
                 pending={checkPending}
