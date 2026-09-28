@@ -1,13 +1,15 @@
-import type {SubmitEvent} from 'react';
+import type {RefObject, SubmitEvent} from 'react';
 import type {ActiveChat, ChatMessage} from '../chat/types.js';
 import type {ChatSession} from '../chat/useChatSession.js';
 import styles from './Conversation.module.css';
 
 type ConversationProps = {
     activeChat: ActiveChat | null;
+    messageInputRef: RefObject<HTMLInputElement | null>;
     mobileVisible: boolean;
     session: ChatSession;
     onBack(): void;
+    onLogout(): void;
 };
 
 function formatTime(timestamp: number): string {
@@ -19,9 +21,11 @@ function formatTime(timestamp: number): string {
 
 export default function Conversation({
     activeChat,
+    messageInputRef,
     mobileVisible,
     session,
     onBack,
+    onLogout,
 }: ConversationProps) {
     const className = `${styles.conversation} ${mobileVisible ? styles.mobileVisible : ''}`;
 
@@ -57,9 +61,15 @@ export default function Conversation({
 
             <div className={styles.messages}>
                 {session.receiveError && (
-                    <p className={styles.receiveError} role="status">
-                        {session.receiveError}
-                    </p>
+                    <div
+                        className={styles.receiveError}
+                        role={session.receiveStopped ? 'alert' : 'status'}
+                    >
+                        <span>{session.receiveError}</span>
+                        {session.receiveStopped && (
+                            <button type="button" onClick={onLogout}>Войти заново</button>
+                        )}
+                    </div>
                 )}
                 {session.messages.map((message: ChatMessage) => (
                     <div
@@ -82,10 +92,14 @@ export default function Conversation({
             </div>
 
             <form className={styles.messageForm} onSubmit={handleSubmit}>
+                <label className={styles.visuallyHidden} htmlFor="message-draft">
+                    Сообщение
+                </label>
                 <input
+                    id="message-draft"
+                    ref={messageInputRef}
                     type="text"
                     placeholder="Напишите сообщение..."
-                    aria-label="Сообщение"
                     maxLength={20_000}
                     value={session.draft}
                     disabled={session.sending}
@@ -94,6 +108,9 @@ export default function Conversation({
                 {session.sendError && (
                     <p className={styles.sendError} role="alert">{session.sendError}</p>
                 )}
+                <p className={styles.visuallyHidden} role="status" aria-live="polite">
+                    {session.sending ? 'Сообщение отправляется' : ''}
+                </p>
                 <button
                     className={styles.sendButton}
                     type="submit"

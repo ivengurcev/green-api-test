@@ -86,6 +86,7 @@ describe('Application', () => {
 
         const button = screen.getByRole('button', {name: 'Проверяем…'}) as HTMLButtonElement;
         expect(button.disabled).toBe(true);
+        expect(screen.getByRole('status').textContent).toContain('Проверяем инстанс');
         await user.click(button);
         expect(client.getState).toHaveBeenCalledTimes(1);
     });

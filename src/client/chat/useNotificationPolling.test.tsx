@@ -115,6 +115,20 @@ describe('useNotificationPolling', () => {
         expect(onMessage).toHaveBeenCalledTimes(1);
     });
 
+    it('does not append a repeated message id twice', async () => {
+        client.receiveNotification
+            .mockResolvedValueOnce(textNotification('same-id', chatId))
+            .mockResolvedValueOnce(textNotification('same-id', chatId))
+            .mockImplementation(() => new Promise(() => {}));
+        client.deleteNotification.mockResolvedValue();
+
+        renderHook(() => useNotificationPolling({client, chatId, onMessage}));
+
+        await waitFor(() => expect(client.receiveNotification).toHaveBeenCalledTimes(3));
+        expect(onMessage).toHaveBeenCalledTimes(1);
+        expect(client.deleteNotification).toHaveBeenCalledTimes(2);
+    });
+
     it('aborts the old request on chat change and on unmount', () => {
         client.receiveNotification.mockImplementation(() => new Promise(() => {}));
         const view = renderHook(
@@ -133,6 +147,33 @@ describe('useNotificationPolling', () => {
         const secondSignal = client.receiveNotification.mock.calls.at(-1)?.[0];
         view.unmount();
         expect(secondSignal?.aborted).toBe(true);
+    });
+
+    it('ignores a late response from the previous chat', async () => {
+        let resolveFirst!: (value: NotificationEnvelope) => void;
+        const first = new Promise<NotificationEnvelope>((resolve) => {
+            resolveFirst = resolve;
+        });
+        client.receiveNotification
+            .mockReturnValueOnce(first)
+            .mockImplementation(() => new Promise(() => {}));
+
+        const view = renderHook(
+            ({currentChatId}) => useNotificationPolling({
+                client,
+                chatId: currentChatId,
+                onMessage,
+            }),
+            {initialProps: {currentChatId: 'first@c.us'}},
+        );
+        view.rerender({currentChatId: 'second@c.us'});
+
+        await act(async () => {
+            resolveFirst(textNotification('late-message', 'first@c.us'));
+        });
+
+        expect(onMessage).not.toHaveBeenCalled();
+        expect(client.deleteNotification).not.toHaveBeenCalled();
     });
 
     it('resets backoff after a successful receive', async () => {

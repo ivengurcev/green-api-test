@@ -9,6 +9,7 @@ const RETRY_DELAYS = [1_000, 2_000, 5_000, 10_000] as const;
 type NotificationPollingOptions = {
     client: GreenApiClient;
     chatId: string | null;
+    sessionGeneration?: number;
     onMessage(message: ChatMessage): void;
 };
 
@@ -49,6 +50,7 @@ function isAuthenticationError(error: unknown): boolean {
 export function useNotificationPolling({
     client,
     chatId,
+    sessionGeneration = 0,
     onMessage,
 }: NotificationPollingOptions): NotificationPollingState {
     const [receiveError, setReceiveError] = useState<string | null>(null);
@@ -148,7 +150,7 @@ export function useNotificationPolling({
         void run();
 
         return () => controller.abort();
-    }, [chatId, client]);
+    }, [chatId, client, sessionGeneration]);
 
     return {receiveError, stopped};
 }

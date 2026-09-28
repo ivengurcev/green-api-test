@@ -18,6 +18,7 @@ export type ChatSession = {
 export function useChatSession(
     client: GreenApiClient,
     activeChat: ActiveChat | null,
+    sessionGeneration = 0,
 ): ChatSession {
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [draft, setDraft] = useState('');
@@ -36,7 +37,7 @@ export function useChatSession(
         setDraft('');
         setSending(false);
         setSendError(null);
-    }, [activeChat?.chatId]);
+    }, [activeChat?.chatId, sessionGeneration]);
 
     useEffect(() => () => sendControllerRef.current?.abort(), []);
 
@@ -46,6 +47,7 @@ export function useChatSession(
     const polling = useNotificationPolling({
         client,
         chatId: activeChat?.chatId ?? null,
+        sessionGeneration,
         onMessage: appendIncoming,
     });
 

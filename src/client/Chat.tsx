@@ -8,8 +8,14 @@ import Conversation from './components/Conversation.js';
 import NewChatDialog from './components/NewChatDialog.js';
 import styles from './Chat.module.css';
 
-export default function Chat({client}: {client: GreenApiClient}) {
+type ChatProps = {
+    client: GreenApiClient;
+    onLogout?(): void;
+};
+
+export default function Chat({client, onLogout = () => {}}: ChatProps) {
     const [activeChat, setActiveChat] = useState<ActiveChat | null>(null);
+    const [sessionGeneration, setSessionGeneration] = useState(0);
     const [mobileView, setMobileView] = useState<'list' | 'conversation'>('list');
     const [dialogOpen, setDialogOpen] = useState(false);
     const [checkPending, setCheckPending] = useState(false);
@@ -17,9 +23,27 @@ export default function Chat({client}: {client: GreenApiClient}) {
     const latestCheckRef = useRef(0);
     const checkControllerRef = useRef<AbortController | null>(null);
     const newChatButtonRef = useRef<HTMLButtonElement>(null);
-    const session = useChatSession(client, activeChat);
+    const messageInputRef = useRef<HTMLInputElement>(null);
+    const focusAfterDialogRef = useRef<'new-chat' | 'message' | null>(null);
+    const session = useChatSession(client, activeChat, sessionGeneration);
 
     useEffect(() => () => checkControllerRef.current?.abort(), []);
+
+    useEffect(() => {
+        if (dialogOpen || focusAfterDialogRef.current === null) {
+            return;
+        }
+
+        const target = focusAfterDialogRef.current;
+        focusAfterDialogRef.current = null;
+        queueMicrotask(() => {
+            if (target === 'message') {
+                messageInputRef.current?.focus();
+            } else {
+                newChatButtonRef.current?.focus();
+            }
+        });
+    }, [activeChat, dialogOpen]);
 
     function openDialog() {
         setCheckError(null);
@@ -32,8 +56,8 @@ export default function Chat({client}: {client: GreenApiClient}) {
         checkControllerRef.current = null;
         setCheckPending(false);
         setCheckError(null);
+        focusAfterDialogRef.current = 'new-chat';
         setDialogOpen(false);
-        queueMicrotask(() => newChatButtonRef.current?.focus());
     }
 
     async function createChat(value: string) {
@@ -65,7 +89,9 @@ export default function Chat({client}: {client: GreenApiClient}) {
             }
 
             setActiveChat({chatId: checked.chatId, phone: `+${phone}`});
+            setSessionGeneration((current) => current + 1);
             setMobileView('conversation');
+            focusAfterDialogRef.current = 'message';
             setDialogOpen(false);
         } catch (error) {
             if (requestId === latestCheckRef.current && !controller.signal.aborted) {
@@ -81,19 +107,23 @@ export default function Chat({client}: {client: GreenApiClient}) {
 
     return (
         <main className={styles.shell}>
-            <ChatSidebar
-                activeChat={activeChat}
-                mobileVisible={mobileView === 'list'}
-                newChatButtonRef={newChatButtonRef}
-                onNewChat={openDialog}
-                onSelectActive={() => setMobileView('conversation')}
-            />
-            <Conversation
-                activeChat={activeChat}
-                mobileVisible={mobileView === 'conversation'}
-                session={session}
-                onBack={() => setMobileView('list')}
-            />
+            <div className={styles.workspace} inert={dialogOpen ? true : undefined}>
+                <ChatSidebar
+                    activeChat={activeChat}
+                    mobileVisible={mobileView === 'list'}
+                    newChatButtonRef={newChatButtonRef}
+                    onNewChat={openDialog}
+                    onSelectActive={() => setMobileView('conversation')}
+                />
+                <Conversation
+                    activeChat={activeChat}
+                    messageInputRef={messageInputRef}
+                    mobileVisible={mobileView === 'conversation'}
+                    session={session}
+                    onBack={() => setMobileView('list')}
+                    onLogout={onLogout}
+                />
+            </div>
             <NewChatDialog
                 open={dialogOpen}
                 pending={checkPending}

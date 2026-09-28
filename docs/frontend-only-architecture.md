@@ -50,14 +50,14 @@ https://api.green-api.com/waInstance{idInstance}/{method}/{apiTokenInstance}
 
 ### Получение сообщений
 
-Входящие события читаются периодическими запросами к [`ReceiveNotification`](https://green-api.com/docs/api/receiving/notifications-format/ReceiveNotification/). GREEN-API возвращает уведомления из общей очереди инстанса по одному, в порядке FIFO. Если очередь пуста, API возвращает `null`.
+Входящие события читаются периодическими запросами к [`ReceiveNotification`](https://green-api.com/docs/api/receiving/technology-http-api/ReceiveNotification/). GREEN-API возвращает уведомления из общей очереди инстанса по одному, в порядке FIFO. Если очередь пуста, API возвращает `null`.
 
 Цикл обработки одного уведомления выглядит так:
 
 1. Получить уведомление через `ReceiveNotification`.
 2. Проверить тип события и извлечь `textMessage` либо `extendedTextMessage` активного чата.
 3. Добавить подходящее сообщение в состояние интерфейса.
-4. Подтвердить обработку методом [`DeleteNotification`](https://green-api.com/docs/api/receiving/notifications-format/DeleteNotification/).
+4. Подтвердить обработку методом [`DeleteNotification`](https://green-api.com/docs/api/receiving/technology-http-api/DeleteNotification/).
 
 Удалять уведомление нужно только после того, как клиент закончил его обработку. Если не удалить уведомление, следующий вызов снова вернёт элемент, находящийся в начале очереди. Уведомления хранятся в очереди 24 часа. Подробнее: [получение уведомлений через HTTP API](https://green-api.com/docs/api/receiving/technology-http-api/).
 

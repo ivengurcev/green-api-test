@@ -1,6 +1,6 @@
-import {render, screen, waitFor} from '@testing-library/react';
+import {render, screen, waitFor, within} from '@testing-library/react';
 import {userEvent} from '@testing-library/user-event';
-import {beforeEach, describe, expect, it} from 'vitest';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {GreenApiError} from './api/GreenApiError.js';
 import type {CheckedWhatsapp} from './api/types.js';
 import Chat from './Chat.js';
@@ -122,6 +122,24 @@ describe('Chat', () => {
         expect(screen.getByText('Входящее сообщение')).toBeTruthy();
     });
 
+    it('starts a fresh session when the same chat is created again', async () => {
+        const user = userEvent.setup();
+        client.checkWhatsapp.mockResolvedValue({existsWhatsapp: true, chatId});
+        client.receiveNotification
+            .mockReset()
+            .mockResolvedValueOnce(textNotification('incoming-1', 'Старая история'))
+            .mockImplementation(() => new Promise(() => {}));
+
+        render(<Chat client={client} />);
+        await submitNewChat(user, '79991234567');
+        expect(await screen.findByText('Старая история')).toBeTruthy();
+
+        await submitNewChat(user, '79991234567');
+
+        await waitFor(() => expect(screen.queryByText('Старая история')).toBeNull());
+        expect(client.receiveNotification).toHaveBeenCalledTimes(3);
+    });
+
     it('exposes async errors to assistive technologies', async () => {
         const user = userEvent.setup();
         client.checkWhatsapp.mockResolvedValue({existsWhatsapp: true, chatId});
@@ -135,6 +153,21 @@ describe('Chat', () => {
         expect((await screen.findByRole('alert')).textContent).toContain('Не удалось отправить');
     });
 
+    it('offers a new login after polling authentication expires', async () => {
+        const user = userEvent.setup();
+        const onLogout = vi.fn();
+        client.checkWhatsapp.mockResolvedValue({existsWhatsapp: true, chatId});
+        client.receiveNotification.mockRejectedValue(
+            new GreenApiError('Доступ', 'auth', 401),
+        );
+
+        render(<Chat client={client} onLogout={onLogout} />);
+        await submitNewChat(user, '79991234567');
+        await user.click(await screen.findByRole('button', {name: 'Войти заново'}));
+
+        expect(onLogout).toHaveBeenCalledTimes(1);
+    });
+
     it('provides accessible names for chat controls and inputs', async () => {
         const user = userEvent.setup();
         client.checkWhatsapp.mockResolvedValue({existsWhatsapp: true, chatId});
@@ -145,19 +178,48 @@ describe('Chat', () => {
 
         expect(screen.getByRole('button', {name: 'Отправить'})).toBeTruthy();
         expect(screen.getByRole('button', {name: 'Назад к чатам'})).toBeTruthy();
-        expect(screen.getByLabelText('Сообщение')).toBeTruthy();
+        const messageInput = screen.getByLabelText('Сообщение') as HTMLInputElement;
+        expect(messageInput.labels).toHaveLength(1);
     });
 
-    it('moves focus into the new-chat dialog and returns it after Escape', async () => {
+    it('announces phone checks and message sending', async () => {
         const user = userEvent.setup();
+        client.checkWhatsapp.mockResolvedValueOnce({existsWhatsapp: true, chatId});
+        client.sendMessage.mockImplementation(() => new Promise(() => {}));
+
+        render(<Chat client={client} />);
+        await submitNewChat(user, '79991234567');
+        await user.type(screen.getByLabelText('Сообщение'), 'Ожидает отправки');
+        await user.click(screen.getByRole('button', {name: 'Отправить'}));
+        expect(screen.getByRole('status').textContent).toContain('Сообщение отправляется');
+
+        await user.click(screen.getByRole('button', {name: 'Новый чат'}));
+        await user.type(screen.getByLabelText('Номер телефона'), '79997654321');
+        client.checkWhatsapp.mockImplementationOnce(() => new Promise(() => {}));
+        await user.click(screen.getByRole('button', {name: 'Создать чат'}));
+        expect(within(screen.getByRole('dialog')).getByRole('status').textContent)
+            .toContain('Проверяем номер');
+    });
+
+    it('traps modal focus and restores a logical focus target after closing', async () => {
+        const user = userEvent.setup();
+        client.checkWhatsapp.mockResolvedValue({existsWhatsapp: true, chatId});
 
         render(<Chat client={client} />);
         const trigger = screen.getByRole('button', {name: 'Новый чат'});
         await user.click(trigger);
 
         expect(document.activeElement).toBe(screen.getByLabelText('Номер телефона'));
+        expect(screen.getByRole('main').querySelector('[inert]')).toBeTruthy();
+        const submit = screen.getByRole('button', {name: 'Создать чат'});
+        submit.focus();
+        await user.tab();
+        expect(document.activeElement).toBe(screen.getByRole('button', {name: 'Закрыть'}));
         await user.keyboard('{Escape}');
         await waitFor(() => expect(document.activeElement).toBe(trigger));
         expect(screen.queryByRole('dialog')).toBeNull();
+
+        await submitNewChat(user, '79991234567');
+        await waitFor(() => expect(document.activeElement).toBe(screen.getByLabelText('Сообщение')));
     });
 });

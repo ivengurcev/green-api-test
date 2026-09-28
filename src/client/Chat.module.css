@@ -9,6 +9,10 @@
     background: var(--color-surface);
 }
 
+.workspace {
+    display: contents;
+}
+
 @media (min-width: 768px) {
     .shell {
         grid-template-columns: var(--sidebar-width) minmax(0, 1fr);

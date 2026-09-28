@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import type {SubmitEvent} from 'react';
 import styles from './NewChatDialog.module.css';
 
@@ -18,12 +18,52 @@ export default function NewChatDialog({
     onSubmit,
 }: NewChatDialogProps) {
     const [phone, setPhone] = useState('');
+    const dialogRef = useRef<HTMLElement>(null);
 
     useEffect(() => {
         if (!open) {
             setPhone('');
         }
     }, [open]);
+
+    useEffect(() => {
+        if (!open) {
+            return;
+        }
+
+        function handleKeyDown(event: KeyboardEvent) {
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                onClose();
+                return;
+            }
+            if (event.key !== 'Tab') {
+                return;
+            }
+
+            const focusable = Array.from(
+                dialogRef.current?.querySelectorAll<HTMLElement>(
+                    'button:not(:disabled), input:not(:disabled)',
+                ) ?? [],
+            );
+            const first = focusable[0];
+            const last = focusable.at(-1);
+
+            if (!first || !last) {
+                return;
+            }
+            if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault();
+                last.focus();
+            } else if (!event.shiftKey && document.activeElement === last) {
+                event.preventDefault();
+                first.focus();
+            }
+        }
+
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [onClose, open]);
 
     if (!open) {
         return null;
@@ -38,13 +78,9 @@ export default function NewChatDialog({
         <div
             className={styles.backdrop}
             role="presentation"
-            onKeyDown={(event) => {
-                if (event.key === 'Escape') {
-                    onClose();
-                }
-            }}
         >
             <section
+                ref={dialogRef}
                 className={styles.dialog}
                 role="dialog"
                 aria-modal="true"
@@ -76,6 +112,10 @@ export default function NewChatDialog({
                     />
 
                     {error && <p className={styles.error} role="alert">{error}</p>}
+
+                    <p className={styles.visuallyHidden} role="status" aria-live="polite">
+                        {pending ? 'Проверяем номер в WhatsApp' : ''}
+                    </p>
 
                     <button className={styles.submit} type="submit" disabled={pending}>
                         {pending ? 'Проверяем…' : 'Создать чат'}

@@ -134,6 +134,10 @@ export default function Login({credentialsActions, clientFactory}: LoginProps) {
                         </p>
                     )}
 
+                    <p className={styles.visuallyHidden} role="status" aria-live="polite">
+                        {status.kind === 'loading' ? 'Проверяем инстанс GREEN-API' : ''}
+                    </p>
+
                     <button
                         className={styles.submitButton}
                         type="submit"

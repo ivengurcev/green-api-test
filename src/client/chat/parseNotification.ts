@@ -39,10 +39,15 @@ export function parseIncomingText(
         return null;
     }
 
+    const timestamp = body.timestamp * 1000;
+    if (!Number.isFinite(timestamp) || timestamp < 0 || timestamp > 8_640_000_000_000_000) {
+        return null;
+    }
+
     return {
         id: body.idMessage,
         text,
-        timestamp: body.timestamp * 1000,
+        timestamp,
         direction: 'incoming',
     };
 }

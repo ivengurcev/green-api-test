@@ -72,6 +72,30 @@ describe('parseIncomingText', () => {
         ],
         ['missing fields', {receiptId: 4, body: {}}],
         ['non-object body', {receiptId: 5, body: 'broken'}],
+        [
+            'non-finite timestamp',
+            notification({
+                idMessage: '4',
+                timestamp: Number.NaN,
+                senderData: {chatId: activeChatId},
+                messageData: {
+                    typeMessage: 'textMessage',
+                    textMessageData: {textMessage: 'x'},
+                },
+            }),
+        ],
+        [
+            'timestamp outside the Date range',
+            notification({
+                idMessage: '5',
+                timestamp: 8_640_000_000_001,
+                senderData: {chatId: activeChatId},
+                messageData: {
+                    typeMessage: 'textMessage',
+                    textMessageData: {textMessage: 'x'},
+                },
+            }),
+        ],
     ] satisfies ReadonlyArray<readonly [string, NotificationEnvelope]>) (
         'returns null for %s',
         (_name, envelope) => {

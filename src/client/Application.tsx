@@ -13,6 +13,6 @@ type AppProps = {
 export default function App({clientFactory = createGreenApiClient}: AppProps = {}) {
     const [credentials, credActions] = useCredentials();
     return credentials 
-        ? <Chat client={clientFactory(credentials)} />
+        ? <Chat client={clientFactory(credentials)} onLogout={credActions.logout} />
         : <Login credentialsActions={credActions} clientFactory={clientFactory} />
 }
