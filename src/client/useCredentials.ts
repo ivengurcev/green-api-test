@@ -1,9 +1,7 @@
 import { useState } from 'react'
+import type { Credentials } from './api/types.js'
 
-export type Credentials = {
-    idInstance: string,
-    apiTokenInstance: string
-}
+export type { Credentials } from './api/types.js'
 
 export type CredentialActions = {
     login: (credentials: Credentials) => void
