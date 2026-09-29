@@ -52,6 +52,19 @@ pnpm check
 
 Команда последовательно запускает TypeScript, тесты и production-сборку.
 
+## Запуск в Docker
+
+Соберите production-образ и запустите контейнер:
+
+```bash
+docker build -t green-api-chat .
+docker run --rm -p 8080:8080 green-api-chat
+```
+
+Приложение будет доступно по адресу `http://localhost:8080`. Реквизиты
+GREEN-API вводятся через форму и не включаются в Docker-образ. Для работы на
+публичном сервере разместите контейнер за HTTPS reverse proxy.
+
 ## Ограничения
 
 - только один активный личный чат;

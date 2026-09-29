@@ -1,0 +1,11 @@
+.git
+.agents
+.codex
+.superpowers
+node_modules
+dist
+design
+.env*
+!.env.example
+npm-debug.log*
+pnpm-debug.log*
