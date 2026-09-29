@@ -25,6 +25,7 @@ export function createGreenApiClient(
         signal?: AbortSignal,
         search = '',
         suffix = '',
+        allowEmptyResponse = false,
     ): Promise<unknown> {
         let response: Response;
 
@@ -56,7 +57,12 @@ export function createGreenApiClient(
         }
 
         try {
-            return await response.json() as unknown;
+            const responseText = await response.text();
+            if (allowEmptyResponse && responseText.trim() === '') {
+                return null;
+            }
+
+            return JSON.parse(responseText) as unknown;
         } catch {
             throw new GreenApiError(
                 'GREEN-API вернул некорректный ответ',
@@ -115,6 +121,8 @@ export function createGreenApiClient(
                 undefined,
                 signal,
                 '?receiveTimeout=5',
+                '',
+                true,
             );
 
             if (data === null) {
@@ -141,7 +149,7 @@ export function createGreenApiClient(
                 `/${receiptId}`,
             );
 
-            if (data !== true) {
+            if (!isRecord(data) || data.result !== true) {
                 invalidResponse();
             }
         },

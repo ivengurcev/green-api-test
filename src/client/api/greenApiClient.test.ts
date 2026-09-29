@@ -64,7 +64,7 @@ describe('createGreenApiClient', () => {
     });
 
     it('uses a five-second notification timeout', async () => {
-        fetchMock.mockResolvedValue(new Response('null', {status: 200}));
+        fetchMock.mockResolvedValue(new Response('', {status: 200}));
         const client = createGreenApiClient(credentials, fetchMock);
 
         await expect(client.receiveNotification()).resolves.toBeNull();
@@ -82,7 +82,10 @@ describe('createGreenApiClient', () => {
     });
 
     it('deletes a notification by receiptId', async () => {
-        fetchMock.mockResolvedValue(new Response('true', {status: 200}));
+        fetchMock.mockResolvedValue(new Response(
+            '{"result":true,"reason":""}',
+            {status: 200},
+        ));
         const client = createGreenApiClient(credentials, fetchMock);
 
         await expect(client.deleteNotification(42)).resolves.toBeUndefined();
@@ -144,7 +147,10 @@ describe('createGreenApiClient', () => {
         fetchMock.mockResolvedValueOnce(new Response('{"receiptId":"17"}', {status: 200}));
         await expect(client.receiveNotification()).rejects.toMatchObject({kind: 'invalid-response'});
 
-        fetchMock.mockResolvedValueOnce(new Response('false', {status: 200}));
+        fetchMock.mockResolvedValueOnce(new Response(
+            '{"result":false,"reason":"Notification not found"}',
+            {status: 200},
+        ));
         await expect(client.deleteNotification(17)).rejects.toMatchObject({kind: 'invalid-response'});
     });
 
