@@ -88,7 +88,7 @@ export default function Chat({client, onLogout = () => {}}: ChatProps) {
                 return;
             }
 
-            setActiveChat({chatId: checked.chatId, phone: `+${phone}`});
+            setActiveChat({chatId: toPersonalChatId(phone), phone: `+${phone}`});
             setSessionGeneration((current) => current + 1);
             setMobileView('conversation');
             focusAfterDialogRef.current = 'message';

@@ -42,7 +42,7 @@ describe('Chat', () => {
         client.sendMessage.mockReset();
     });
 
-    it('creates a chat using the chatId returned by GREEN-API', async () => {
+    it('checks WhatsApp using the normalized personal chatId', async () => {
         const user = userEvent.setup();
         client.checkWhatsapp.mockResolvedValue({
             existsWhatsapp: true,
@@ -57,6 +57,23 @@ describe('Chat', () => {
             '79991234567@c.us',
             expect.any(AbortSignal),
         );
+    });
+
+    it('displays a c.us notification when CheckWhatsapp returns a LID', async () => {
+        const user = userEvent.setup();
+        client.checkWhatsapp.mockResolvedValue({
+            existsWhatsapp: true,
+            chatId: '123456789012345@lid',
+        });
+        client.receiveNotification
+            .mockReset()
+            .mockResolvedValueOnce(textNotification('incoming-lid', 'Ответ через LID'))
+            .mockImplementation(() => new Promise(() => {}));
+
+        render(<Chat client={client} />);
+        await submitNewChat(user, '79991234567');
+
+        expect(await screen.findByText('Ответ через LID')).toBeTruthy();
     });
 
     it('does not replace the current chat when the next number is invalid', async () => {
